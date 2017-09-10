@@ -1,36 +1,14 @@
 const TelegramBot = require('node-telegram-bot-api');
-const request = require('request-promise');
 
-const config = require('./config');
-
-// Sweet tracker (택배 정보) API
-class TrackerAPI {
-
-    static GetTrackerBaseURL() {
-        return 'http://info.sweettracker.co.kr';
-    }
-
-    static CreateQueryParcelPromise(companyCode, invoiceNumber) {
-
-        var qs = {
-            t_key: config.trackerAPIKey,
-            t_code: companyCode,
-            t_invoice: invoiceNumber,
-        };
-
-        var options = {
-            url: TrackerAPI.GetTrackerBaseURL() + '/api/v1/trackingInfo',
-            qs: qs,
-            json: true, // Enable automatic json parse
-        }
-
-        return request(options);
-    }
-}
+const config     = require('./config');
+const TrackerAPI = require('./TrackerAPI');
 
 // Create a bot that uses 'polling' to fetch new updates (rather than Webhook)
 const bot = new TelegramBot(config.telegramToken, { polling: true });
 
+//
+// Start
+//
 bot.onText(/\/start/, (msg, match) => {
 
     const chatID = msg.chat.id;
@@ -39,6 +17,54 @@ bot.onText(/\/start/, (msg, match) => {
     bot.sendMessage(chatID, words);
 });
 
+//
+// /c
+// Lists all company codes.
+//
+bot.onText(/\/c/, (msg, match) => {
+
+    const chatID = msg.chat.id;
+    var invoice = match[1];
+
+    TrackerAPI.CreateRetrieveCompanyCodeListPromise()
+        .then(resp => {
+
+            var message = "";
+
+            resp.Company.forEach((_, index) => {
+                message += `${index}. ${_.Code} (${_.Name})\n`;
+            });
+
+            bot.sendMessage(chatID, message, { parse_mode: "html" });
+        });
+});
+
+//
+// /g [invoice]
+// Guesses the company code by invoice number.
+//
+bot.onText(/\/g (\d+)/, (msg, match) => {
+
+    const chatID = msg.chat.id;
+    var invoice = match[1];
+
+    TrackerAPI.CreateGuessCompanyCodePromise(invoice)
+        .then(resp => {
+
+            var message = "";
+
+            resp.Recommend.forEach((_, index) => {
+                message += `${index}. ${_.Code} (${_.Name})\n`;
+            });
+
+            bot.sendMessage(chatID, message, { parse_mode: "html" });
+        });
+});
+
+//
+// /q [company code] [invoice]
+// Queries parcel info by company code and invoice number.
+//
 bot.onText(/\/q (.+) (.+)/, (msg, match) => {
 
     const chatID = msg.chat.id;
@@ -63,12 +89,10 @@ bot.onText(/\/q (.+) (.+)/, (msg, match) => {
                 });
 
             bot.sendMessage(chatID, message, { parse_mode: "html" });
-        })
-        .catch(err => {
-            console.log("Something went wrong. \n " + err)
         });
 });
 
+// Useless
 bot.on('Message', (msg) => {
     console.log(msg);
-});
+})
