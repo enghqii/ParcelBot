@@ -12,9 +12,24 @@ const bot = new TelegramBot(config.telegramToken, { polling: true });
 bot.onText(/\/start/, (msg, match) => {
 
     const chatID = msg.chat.id;
-    var words = "Hello, " + msg.from.first_name + ". I'm your parcel bot.";
+    var message = `Hello, ${msg.from.first_name}. I'm your parcel bot.\n`;
+    message += "To see the command list, run /help."
 
-    bot.sendMessage(chatID, words);
+    bot.sendMessage(chatID, message);
+});
+
+//
+// Help
+//
+bot.onText(/\/help/, (msg, match) => {
+
+    const chatID = msg.chat.id;
+    var message = "<b>Command list</b>\n";
+    message += "/c\nLists all company codes.\n";
+    message += "/g [invoice]\nGuesses the company code by invoice number.\n";
+    message += "/q [company code] [invoice]\nQueries parcel info by company code and invoice number.\n";
+
+    bot.sendMessage(chatID, message, { parse_mode: "html" });
 });
 
 //
@@ -35,6 +50,9 @@ bot.onText(/\/c/, (msg, match) => {
                 message += `${index}. ${_.Code} (${_.Name})\n`;
             });
 
+            return message;
+        })
+        .then(message => {
             bot.sendMessage(chatID, message, { parse_mode: "html" });
         });
 });
@@ -57,6 +75,9 @@ bot.onText(/\/g (\d+)/, (msg, match) => {
                 message += `${index}. ${_.Code} (${_.Name})\n`;
             });
 
+            return message;
+        })
+        .then(message => {
             bot.sendMessage(chatID, message, { parse_mode: "html" });
         });
 });
@@ -74,12 +95,14 @@ bot.onText(/\/q (.+) (.+)/, (msg, match) => {
 
             var message = "";
 
+            // message header
             message += `<b>Invoice: ${resp.invoiceNo}</b>\n`;
             message += `From: ${resp.senderName}\n`;
             message += `To: ${resp.receiverName}, ${resp.receiverAddr}\n`;
             message += `Item: ${resp.itemName}\n`;
             message += '\n';
 
+            // append details
             resp.trackingDetails
                 .sort((d1, d2) => d1.time - d2.time)
                 .map((detail) => {
@@ -88,6 +111,9 @@ bot.onText(/\/q (.+) (.+)/, (msg, match) => {
                     message += (str + '\n');
                 });
 
+            return message;
+        })
+        .then(message => {
             bot.sendMessage(chatID, message, { parse_mode: "html" });
         });
 });
