@@ -1,8 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 const request = require('request-promise');
 
-// Telegram bot identifier
-const token = '[Your bot token]';
+const config = require('./config');
 
 // Sweet tracker (택배 정보) API
 class TrackerAPI {
@@ -11,14 +10,10 @@ class TrackerAPI {
         return 'http://info.sweettracker.co.kr';
     }
 
-    static GetTrackerAPIKey() {
-        return '[Your api key]';
-    }
-
     static CreateQueryParcelPromise(companyCode, invoiceNumber) {
 
         var qs = {
-            t_key: TrackerAPI.GetTrackerAPIKey(),
+            t_key: config.trackerAPIKey,
             t_code: companyCode,
             t_invoice: invoiceNumber,
         };
@@ -34,7 +29,7 @@ class TrackerAPI {
 }
 
 // Create a bot that uses 'polling' to fetch new updates (rather than Webhook)
-const bot = new TelegramBot(token, { polling: true });
+const bot = new TelegramBot(config.telegramToken, { polling: true });
 
 bot.onText(/\/start/, (msg, match) => {
 
