@@ -100,6 +100,7 @@ bot.onText(/\/q (.+) (.+)/, (msg, match) => {
             message += `From: ${resp.senderName}\n`;
             message += `To: ${resp.receiverName}, ${resp.receiverAddr}\n`;
             message += `Item: ${resp.itemName}\n`;
+            message += `Status: ${resp.complete ? "completed" : "in transit"}\n`;
             message += '\n';
 
             // append details
