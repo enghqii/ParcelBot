@@ -28,6 +28,8 @@ bot.onText(/\/help/, (msg, match) => {
     message += "/c\nLists all company codes.\n";
     message += "/g [invoice]\nGuesses the company code by invoice number.\n";
     message += "/q [company code] [invoice]\nQueries parcel info by company code and invoice number.\n";
+    message += "/e [company code] [invoice]\nEnlist an invoice.\n";
+    message += "/l\nList up every enlisted invoices.\n";
 
     bot.sendMessage(chatID, message, { parse_mode: "html" });
 });
@@ -119,7 +121,53 @@ bot.onText(/\/q (.+) (.+)/, (msg, match) => {
         });
 });
 
+//
+// /e [company code] [invoice]
+// enlist
+//
+bot.onText(/\/e (.+) (.+)/, (msg, match) => {
+
+    const chatID = msg.chat.id;
+    const userID = msg.from.id;
+
+    TrackerAPI.CreateQueryParcelPromise(match[1], match[2])
+        .then(resp => {
+
+            if (resp.complete) {
+                return Promise.reject('delivery already completed.');
+            }
+            else {
+                return new ParcelInfo(match[1], match[2]);
+            }
+        })
+        .then(parcelInfo => {
+            // TODO: implement enlist feature
+        })
+        .catch(e => {
+            return `Enlist request rejected. (${e})`;
+        })
+        .then(message => {
+            // bot.sendMessage(chatID, message, { parse_mode: "html" });
+        })
+});
+
+//
+// /l
+// list up
+//
+bot.onText(/\/l/, (msg, match) => {
+
+    const chatID = msg.chat.id;
+    const userID = msg.from.id;
+
+    var message = "";
+
+    // TODO: implement list up feature
+    // bot.sendMessage(chatID, message, { parse_mode: "html" });
+
+});
+
 // Useless
-bot.on('Message', (msg) => {
+bot.on('message', (msg) => {
     console.log(msg);
 })
