@@ -5,11 +5,6 @@ export class TrackerAPI {
     
     public static readonly BaseURL: string = "http://info.sweettracker.co.kr";
 
-    /**
-     * 
-     * @param companyCode 
-     * @param invoiceNumber 
-     */
     public static CreateQueryParcelPromise(companyCode: string, invoiceNumber: string): request.RequestPromise {
 
         let qs: object = {
@@ -28,10 +23,6 @@ export class TrackerAPI {
         return promise;
     }
 
-    /**
-     * 
-     * @param invoiceNumber 
-     */
     public static CreateGuessCompanyCodePromise(invoiceNumber: string): request.RequestPromise {
         
         let qs: object = {
@@ -65,10 +56,6 @@ export class TrackerAPI {
         return promise;
     }
 
-    /**
-     * 
-     * @param err 
-     */
     public static ErrorHandler(err): void {
         console.log("Something went wrong. \n" + err);
     }

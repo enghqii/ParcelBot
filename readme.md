@@ -2,7 +2,7 @@
 
 ```
 $ npm install
-$ tsc
+$ npm start
 ```
 
 # config.ts

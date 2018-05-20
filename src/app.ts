@@ -1,10 +1,10 @@
 import * as TelegramBot from 'node-telegram-bot-api';
-import { TrackerAPI } from './TrackerAPI';
 
+import { TrackerAPI } from './TrackerAPI';
 import { Config } from './config'
 
 /**
- * 
+ * ParcelBot main class
  */
 class ParcelBot extends TelegramBot {
 
@@ -38,7 +38,7 @@ class ParcelBot extends TelegramBot {
     }
 
     /**
-     * Help
+     * /help
      * Print out help strings
      */
     private Help(msg: TelegramBot.Message, match: RegExpExecArray | null): void {
