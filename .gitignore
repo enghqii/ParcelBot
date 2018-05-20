@@ -1,4 +1,11 @@
 /.idea
 /node_modules
 
-config.js
+# secrets
+/src/config.ts
+
+# build output
+/built
+
+# mac
+.DS_Store
